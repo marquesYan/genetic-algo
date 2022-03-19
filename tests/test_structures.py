@@ -1,6 +1,6 @@
 import secrets
 
-from genetic_algo.structures import Individual, Population
+from genetic_algo.structures import Dataset, DatasetItem, Individual, Population
 
 
 def test_random_individual(monkeypatch):
@@ -16,3 +16,73 @@ def test_random_individual(monkeypatch):
     result = Individual.random(5)
 
     assert result == expected
+
+
+def test_individual_evaluation(monkeypatch):
+    items = [
+        DatasetItem(
+            name="notebook",
+            fitness=5,
+            weight=7,
+        ),
+        DatasetItem(
+            name="tv",
+            fitness=8,
+            weight=8,
+        ),
+        DatasetItem(
+            name="ring",
+            fitness=2,
+            weight=10,
+        ),
+        DatasetItem(
+            name="videogame",
+            fitness=9,
+            weight=6,
+        ),
+    ]
+    
+    dataset = Dataset(
+        expected_weight=20,
+        items=items,
+    )
+
+    individual = Individual(genes=[1, 0, 0, 1])
+    individual.evaluate(dataset)
+
+    assert individual.fitness == 14
+
+
+def test_individual_evaluation_with_penality(monkeypatch):
+    items = [
+        DatasetItem(
+            name="notebook",
+            fitness=5,
+            weight=7,
+        ),
+        DatasetItem(
+            name="tv",
+            fitness=8,
+            weight=8,
+        ),
+        DatasetItem(
+            name="ring",
+            fitness=2,
+            weight=10,
+        ),
+        DatasetItem(
+            name="videogame",
+            fitness=9,
+            weight=6,
+        ),
+    ]
+    
+    dataset = Dataset(
+        expected_weight=12,
+        items=items,
+    )
+
+    individual = Individual(genes=[1, 0, 0, 1])
+    individual.evaluate(dataset)
+
+    assert individual.fitness == -86
