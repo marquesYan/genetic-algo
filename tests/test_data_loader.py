@@ -9,7 +9,7 @@ def test_load_dataset(tmpdir):
     dataset_items = [
         DatasetItem(
             name="Item1",
-            value=1,
+            fitness=1,
             weight=0.5,
         )
     ]

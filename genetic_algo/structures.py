@@ -7,8 +7,15 @@ from typing import List
 
 @dataclass
 class DatasetItem:
+    # Identification of the item
     name: str
-    value: int
+
+    # The fitness associated with item.
+    # Higher fitness increases the chance of
+    # the item to be considered in the solution
+    fitness: int
+
+    # The weight associated with the solution.
     weight: float
 
 
@@ -27,6 +34,11 @@ class Individual:
     # can range from 0 to 1.
     genes: List[int]
 
+    # Current fitness of individual, based in the
+    # value assigned in it's genes and in the dataset
+    # goal
+    fitness: float = 0
+
     @staticmethod
     def random(genes_size: int) -> "Individual":
         genes = []
@@ -34,6 +46,22 @@ class Individual:
             genes.append(secrets.randbelow(2))
         return Individual(genes)
 
+    def evaluate(self, dataset: Dataset) -> None:
+        # Reset fitness
+        self.fitness = 0
+
+        # Weight of the individual based in the dataset
+        weight = 0
+
+        for index, gene in enumerate(self.genes):
+            if gene == 1:
+                item: DatasetItem = dataset.items[index]
+                weight += item.weight
+                self.fitness += item.fitness
+        
+        if weight > dataset.expected_weight:
+            # FIXME improve penality system
+            self.fitness -= 100
 
 @dataclass
 class Population:
