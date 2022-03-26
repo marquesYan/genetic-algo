@@ -1,6 +1,7 @@
 import secrets
+from unittest import mock
 
-from genetic_algo.structures import Dataset, DatasetItem, DatasetOptions, Individual, Population, SteamRoller
+from genetic_algo.structures import Dataset, DatasetItem, DatasetOptions, Individual, Population, SteamRoller, crossover
 
 DATASET_ITEMS = [
     DatasetItem(
@@ -96,3 +97,44 @@ def test_steam_roller_rollet_selection(monkeypatch):
 
     assert individuals[0].selected is True
     assert individuals[1].selected is False
+
+
+def test_crossover_returns_flipped_genes(monkeypatch):
+    parent_a = Individual(genes=[1, 0, 0, 1], selected=True)
+    parent_b = Individual(genes=[0, 1, 0, 1], selected=True)
+        
+    expected_child_a = Individual(genes=[1, 1, 0, 1], selected=True)
+    expected_child_b = Individual(genes=[0, 0, 0, 1], selected=True)
+
+    monkeypatch.setattr(
+        secrets,
+        "randbelow",
+        mock.Mock(side_effect=[2, 1, 3])
+    )
+
+    child_a, child_b = crossover(parent_a, parent_b, 4)
+
+    assert child_a == expected_child_a
+    assert child_b == expected_child_b
+
+
+def test_steam_roller_apply_crossover_adds_childs_to_population(monkeypatch):
+    dataset = Dataset(
+        expected_weight=20,
+        items=DATASET_ITEMS,
+        options=DatasetOptions(
+            selection_size=1,
+            most_crossover_genes=2,
+        )
+    )
+
+    sr = SteamRoller(
+        dataset,
+        population=Population.random(4, 2)
+    )
+
+    monkeypatch.setattr(secrets, "randbelow", lambda _: 1)
+
+    sr.apply_crossover()
+
+    assert len(sr.population) == 8
