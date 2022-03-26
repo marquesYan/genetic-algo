@@ -209,6 +209,16 @@ class SteamRoller:
             target = self.population[index]
             mutate(target, self.dataset.options.most_mutation_genes)
 
+    def smash(self) -> None:
+        # TODO ability to apply elitism
+
+        self.population = list(
+            filter(
+                lambda individual: individual.selected,
+                self.population,
+            )
+        )
+
 
 def crossover(
     parent_a: Individual,
