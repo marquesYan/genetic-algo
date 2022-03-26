@@ -1,0 +1,38 @@
+{
+    "items": [
+        {
+            "name": "notebook",
+            "fitness": 5,
+            "weight": 7
+        },
+        {
+            "name": "tv",
+            "fitness": 8,
+            "weight": 8
+        },
+        {
+            "name": "tablet",
+            "fitness": 3,
+            "weight": 4
+        },
+        {
+            "name": "anel",
+            "fitness": 2,
+            "weight": 10
+        },
+        {
+            "name": "colar",
+            "fitness": 7,
+            "weight": 4
+        }
+    ],
+    "options": {
+        "expected_weight": 10,
+        "max_generations": 10,
+        "selection_size": 50,
+        "most_crossover_genes": 4,
+        "population_size": 100,
+        "most_mutation_individuals": 2,
+        "most_mutation_genes": 4
+    }
+}
