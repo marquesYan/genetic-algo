@@ -1,9 +1,8 @@
 """Data structures used for genetic algorithm"""
 
-from itertools import accumulate
 import secrets
-from dataclasses import dataclass, field
-from typing import List
+from dataclasses import dataclass
+from typing import List, Tuple
 
 
 @dataclass
@@ -23,6 +22,14 @@ class DatasetItem:
 @dataclass
 class DatasetOptions:
     selection_size: int = 10
+
+    # How many genes at most to apply the crossover
+    most_crossover_genes: int = 4
+
+    def __post_init__(self):
+        # FIXME make sure most_crossover_genes is not
+        # greater than genes size
+        pass
 
 
 @dataclass
@@ -75,6 +82,13 @@ class Individual:
             # FIXME improve penality system
             self.fitness -= 100
 
+    def clone(self) -> "Individual":
+        return Individual(
+            self.genes.copy(),
+            self.fitness,
+            self.selected,
+        )
+
 @dataclass
 class Population:
     # All individuals of population
@@ -88,8 +102,20 @@ class Population:
 
         return Population(individuals)
 
+    def add_all(self, *individuals: Individual) -> None:
+        self.individuals.extend(individuals)
+
     def sort(self) -> None:
         self.individuals.sort(key=lambda i: i.fitness)
+
+    def __getitem__(self, index: int) -> Individual:
+        return self.individuals[index]
+
+    def __iter__(self) -> Individual:
+        return self.individuals.__iter__()
+
+    def __len__(self) -> Individual:
+        return len(self.individuals)
 
 
 @dataclass
@@ -132,3 +158,49 @@ class SteamRoller:
                     individual = self.population.individuals[index]
                     individual.selected = True
                     break
+    
+    def apply_crossover(self) -> None:
+        selecteds: List[Individual] = list(filter(
+            lambda individual: individual.selected,
+            self.population
+        ))
+
+        # Make sure selecteds are even, so we have
+        # two parent always
+        if len(selecteds) % 2 != 0:
+            self.population.sort()
+
+            # FIXME should we make sure the most adapted is selected?
+            most_adapted = self.population[0]
+
+            selecteds.append(most_adapted)
+
+        for index in range(0, len(selecteds) - 1, 2):
+            parent_a = selecteds[index]
+            parent_b = selecteds[index + 1]
+
+            childs = crossover(
+                parent_a,
+                parent_b,
+                self.dataset.options.most_crossover_genes
+            )
+
+            self.population.add_all(*childs)
+
+
+def crossover(
+    parent_a: Individual,
+    parent_b: Individual,
+    most_crossover_genes: int,
+) -> Tuple[Individual, Individual]:
+    child_a = parent_a.clone()
+    child_b = parent_b.clone()
+
+    # Take a random number of genes to change
+    for _ in range(secrets.randbelow(most_crossover_genes + 1)):
+        index = secrets.randbelow(len(parent_a.genes) + 1)
+
+        child_a.genes[index] = parent_b.genes[index]
+        child_b.genes[index] = parent_a.genes[index]
+
+    return child_a, child_b
