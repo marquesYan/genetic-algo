@@ -1,7 +1,7 @@
 import secrets
 from unittest import mock
 
-from genetic_algo.structures import Dataset, DatasetItem, DatasetOptions, Individual, Population, SteamRoller, crossover
+from genetic_algo.structures import Dataset, DatasetItem, DatasetOptions, Individual, Population, SteamRoller, crossover, mutate
 
 DATASET_ITEMS = [
     DatasetItem(
@@ -130,11 +130,39 @@ def test_steam_roller_apply_crossover_adds_childs_to_population(monkeypatch):
 
     sr = SteamRoller(
         dataset,
-        population=Population.random(4, 2)
+        population=Population.random(4, 4)
     )
+
+    # Select all individuals
+    for individual in sr.population:
+        individual.selected = True
 
     monkeypatch.setattr(secrets, "randbelow", lambda _: 1)
 
     sr.apply_crossover()
 
     assert len(sr.population) == 8
+
+
+def test_mutate_flips_genes(monkeypatch):
+    individual = Individual(
+        genes=[0, 1, 1, 0],
+        fitness=0,
+        selected=True,
+    )
+
+    expected_individual = Individual(
+        genes=[1, 1, 1, 1],
+        fitness=0,
+        selected=True
+    )
+
+    monkeypatch.setattr(
+        secrets,
+        "randbelow",
+        mock.Mock(side_effect=[2, 0, 3])
+    )
+
+    mutate(individual, 1)
+
+    assert individual == expected_individual

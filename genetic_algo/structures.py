@@ -27,6 +27,12 @@ class DatasetOptions:
     # How many genes at most to apply the crossover
     most_crossover_genes: int = 4
 
+    # How many individuals at most to mutate
+    most_mutation_individuals: int = 10
+
+    # How many genes at most to mutate
+    most_mutation_genes: int = 2
+
     def __post_init__(self):
         # FIXME make sure most_crossover_genes is not
         # greater than genes size
@@ -89,6 +95,7 @@ class Individual:
             self.fitness,
             self.selected,
         )
+
 
 @dataclass
 class Population:
@@ -191,6 +198,17 @@ class SteamRoller:
 
             self.population.add_all(*childs)
 
+    def apply_mutation(self) -> None:
+        mutation_len = secrets.randbelow(
+            self.dataset.options.most_mutation_individuals
+        )
+
+        # Loop through all randomly selected individuals
+        for _ in range(mutation_len):
+            index = secrets.randbelow(len(self.population) + 1)
+            target = self.population[index]
+            mutate(target, self.dataset.options.most_mutation_genes)
+
 
 def crossover(
     parent_a: Individual,
@@ -208,3 +226,10 @@ def crossover(
         child_b.genes[index] = parent_a.genes[index]
 
     return child_a, child_b
+
+
+def mutate(invididual: Individual, most_mutation_genes: int) -> None:
+    # Loop through all randomly selected genes
+    for _ in range(secrets.randbelow(most_mutation_genes)):
+        gene = secrets.randbelow(len(invididual.genes))
+        invididual.genes[gene] ^= 1
