@@ -1,5 +1,6 @@
 """Data structures used for genetic algorithm"""
 
+from random import shuffle
 import secrets
 from dataclasses import dataclass
 from typing import List, Tuple
@@ -174,6 +175,9 @@ class SteamRoller:
             most_adapted = self.population[0]
 
             selecteds.append(most_adapted)
+        
+        # Ensure parents are randomly assigned
+        shuffle(selecteds)
 
         for index in range(0, len(selecteds) - 1, 2):
             parent_a = selecteds[index]
