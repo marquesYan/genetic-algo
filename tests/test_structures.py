@@ -43,8 +43,10 @@ def test_random_individual(monkeypatch):
 
 def test_individual_evaluation(monkeypatch):    
     dataset = Dataset(
-        expected_weight=20,
         items=DATASET_ITEMS,
+        options=DatasetOptions(
+            expected_weight=20,
+        )
     )
 
     individual = Individual(genes=[1, 0, 0, 1])
@@ -55,8 +57,10 @@ def test_individual_evaluation(monkeypatch):
 
 def test_individual_evaluation_with_penality(monkeypatch):
     dataset = Dataset(
-        expected_weight=12,
         items=DATASET_ITEMS,
+        options=DatasetOptions(
+            expected_weight=12,
+        )
     )
 
     individual = Individual(genes=[1, 0, 0, 1])
@@ -67,9 +71,9 @@ def test_individual_evaluation_with_penality(monkeypatch):
 
 def test_steam_roller_rollet_selection(monkeypatch):
     dataset = Dataset(
-        expected_weight=20,
         items=DATASET_ITEMS,
         options=DatasetOptions(
+            expected_weight=20,
             selection_size=1,
         )
     )
@@ -120,9 +124,9 @@ def test_crossover_returns_flipped_genes(monkeypatch):
 
 def test_steam_roller_apply_crossover_adds_childs_to_population(monkeypatch):
     dataset = Dataset(
-        expected_weight=20,
         items=DATASET_ITEMS,
         options=DatasetOptions(
+            expected_weight=20,
             selection_size=1,
             most_crossover_genes=2,
         )

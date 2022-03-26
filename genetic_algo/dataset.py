@@ -2,7 +2,7 @@
 
 import json
 
-from .structures import DatasetItem, Dataset
+from .structures import DatasetItem, Dataset, DatasetOptions
 
 
 def load_from_file(path: str) -> Dataset:
@@ -14,6 +14,8 @@ def load_from_file(path: str) -> Dataset:
         items.append(DatasetItem(**item))
 
     return Dataset(
-        expected_weight=content["expected_weight"],
+        options=DatasetOptions(
+            **content["options"],
+        ),
         items=items,
     )

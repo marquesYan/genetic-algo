@@ -22,7 +22,16 @@ class DatasetItem:
 
 @dataclass
 class DatasetOptions:
+    # Value with the ideal weight
+    expected_weight: float
+
     selection_size: int = 10
+
+    # How many generations to run
+    max_generations: int = 100
+
+    # How many individuals to use for each generation
+    population_size: int = 100
 
     # How many genes at most to apply the crossover
     most_crossover_genes: int = 4
@@ -41,13 +50,10 @@ class DatasetOptions:
 
 @dataclass
 class Dataset:
-    # Value with the ideal weight
-    expected_weight: float
-
     # Items to test
     items: List[DatasetItem]
 
-    options: DatasetOptions = DatasetOptions()
+    options: DatasetOptions
 
 
 @dataclass
@@ -85,7 +91,7 @@ class Individual:
                 weight += item.weight
                 self.fitness += item.fitness
         
-        if weight > dataset.expected_weight:
+        if weight > dataset.options.expected_weight:
             # FIXME improve penality system
             self.fitness -= 100
 
@@ -113,8 +119,11 @@ class Population:
     def add_all(self, *individuals: Individual) -> None:
         self.individuals.extend(individuals)
 
-    def sort(self) -> None:
-        self.individuals.sort(key=lambda i: i.fitness)
+    def sort_by_fitness(self) -> None:
+        self.individuals.sort(
+            reverse=True,
+            key=lambda i: i.fitness
+        )
 
     def __getitem__(self, index: int) -> Individual:
         return self.individuals[index]
@@ -132,8 +141,18 @@ class SteamRoller:
     population: Population
     generation: int = 0
 
+    @staticmethod
+    def from_dataset(dataset: Dataset) -> "SteamRoller":
+        return SteamRoller(
+            dataset,
+            Population.random(
+                dataset.options.population_size,
+                len(dataset.items),
+            )
+        )
+
     def evaluate_population(self) -> None:
-        for i in self.population.individuals:
+        for i in self.population:
             i.evaluate(self.dataset)
 
     def select_population(self) -> None:
@@ -142,15 +161,15 @@ class SteamRoller:
         It uses the "rollet" algorithm for the selection process.
         """
         lower = 0
-        for i in self.population.individuals:
+        for i in self.population:
             if i.fitness < lower:
                 lower = i.fitness
 
         if lower < 0:
-            for i in self.population.individuals:
+            for i in self.population:
                 i.fitness -= lower
 
-        self.population.sort()
+        self.population.sort_by_fitness()
 
         fitness_total = 0
         accumulated_fitness = []
@@ -176,7 +195,7 @@ class SteamRoller:
         # Make sure selecteds are even, so we have
         # two parent always
         if len(selecteds) % 2 != 0:
-            self.population.sort()
+            self.population.sort_by_fitness()
 
             # FIXME should we make sure the most adapted is selected?
             most_adapted = self.population[0]
@@ -205,20 +224,33 @@ class SteamRoller:
 
         # Loop through all randomly selected individuals
         for _ in range(mutation_len):
-            index = secrets.randbelow(len(self.population) + 1)
+            index = secrets.randbelow(len(self.population))
             target = self.population[index]
             mutate(target, self.dataset.options.most_mutation_genes)
 
-    def smash(self) -> None:
+    def apply_artificial_filter(self) -> None:
         # TODO ability to apply elitism
 
-        self.population = list(
+        new_individuals = list(
             filter(
                 lambda individual: individual.selected,
                 self.population,
             )
         )
 
+        self.population = Population(new_individuals[:self.dataset.options.population_size])
+
+    def smash(self) -> Population:
+        # FIXME what to return here?
+        for self.generation in range(self.dataset.options.max_generations):
+            self.evaluate_population()
+            self.select_population()
+            self.apply_crossover()
+            self.apply_mutation()
+            self.evaluate_population()
+            self.apply_artificial_filter()            
+
+        return self.population
 
 def crossover(
     parent_a: Individual,
@@ -230,7 +262,7 @@ def crossover(
 
     # Take a random number of genes to change
     for _ in range(secrets.randbelow(most_crossover_genes + 1)):
-        index = secrets.randbelow(len(parent_a.genes) + 1)
+        index = secrets.randbelow(len(parent_a.genes))
 
         child_a.genes[index] = parent_b.genes[index]
         child_b.genes[index] = parent_a.genes[index]
