@@ -1,38 +1,174 @@
 {
-    "items": [
-        {
-            "name": "notebook",
-            "fitness": 5,
-            "weight": 7
-        },
-        {
-            "name": "tv",
-            "fitness": 8,
-            "weight": 8
-        },
-        {
-            "name": "tablet",
-            "fitness": 3,
-            "weight": 4
-        },
-        {
-            "name": "anel",
-            "fitness": 2,
-            "weight": 10
-        },
-        {
-            "name": "colar",
-            "fitness": 7,
-            "weight": 4
-        }
-    ],
     "options": {
-        "expected_weight": 10,
-        "max_generations": 10,
+        "expected_weight": 5000,
+        "expected_volume": 20000000,
+        "max_generations": 500,
         "selection_size": 50,
         "most_crossover_genes": 4,
         "population_size": 100,
         "most_mutation_individuals": 2,
         "most_mutation_genes": 4
-    }
+    },
+    "items": [
+        {
+            "volume": 6739800,
+            "weight": 3675
+        },
+        {
+            "volume": 4230000,
+            "weight": 2306
+        },
+        {
+            "volume": 4181120,
+            "weight": 2279
+        },
+        {
+            "volume": 3912002,
+            "weight": 133
+        },
+        {
+            "volume": 3625815,
+            "weight": 1977
+        },
+        {
+            "volume": 3130200,
+            "weight": 1706
+        },
+        {
+            "volume": 1611498,
+            "weight": 878
+        },
+        {
+            "volume": 1532160,
+            "weight": 835
+        },
+        {
+            "volume": 1428000,
+            "weight": 999
+        },
+        {
+            "volume": 1388610,
+            "weight": 972
+        },
+        {
+            "volume": 1271505,
+            "weight": 890
+        },
+        {
+            "volume": 1213800,
+            "weight": 849
+        },
+        {
+            "volume": 1104000,
+            "weight": 772
+        },
+        {
+            "volume": 1086980,
+            "weight": 760
+        },
+        {
+            "volume": 965700,
+            "weight": 675
+        },
+        {
+            "volume": 917400,
+            "weight": 642
+        },
+        {
+            "volume": 767000,
+            "weight": 418
+        },
+        {
+            "volume": 750600,
+            "weight": 525
+        },
+        {
+            "volume": 714000,
+            "weight": 499
+        },
+        {
+            "volume": 684600,
+            "weight": 373
+        },
+        {
+            "volume": 661640,
+            "weight": 198
+        },
+        {
+            "volume": 639693,
+            "weight": 191
+        },
+        {
+            "volume": 639693,
+            "weight": 348
+        },
+        {
+            "volume": 611040,
+            "weight": 333
+        },
+        {
+            "volume": 600000,
+            "weight": 180
+        },
+        {
+            "volume": 552000,
+            "weight": 165
+        },
+        {
+            "volume": 543456,
+            "weight": 163
+        },
+        {
+            "volume": 543456,
+            "weight": 296
+        },
+        {
+            "volume": 516000,
+            "weight": 154
+        },
+        {
+            "volume": 472600,
+            "weight": 141
+        },
+        {
+            "volume": 432000,
+            "weight": 129
+        },
+        {
+            "volume": 420000,
+            "weight": 126
+        },
+        {
+            "volume": 400000,
+            "weight": 120
+        },
+        {
+            "volume": 312000,
+            "weight": 93
+        },
+        {
+            "volume": 305520,
+            "weight": 91
+        },
+        {
+            "volume": 305520,
+            "weight": 91
+        },
+        {
+            "volume": 300000,
+            "weight": 90
+        },
+        {
+            "volume": 291900,
+            "weight": 87
+        },
+        {
+            "volume": 279276,
+            "weight": 223
+        },
+        {
+            "volume": 279276,
+            "weight": 152
+        }
+    ]
 }

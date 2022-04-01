@@ -9,15 +9,18 @@ from typing import List, Tuple
 @dataclass
 class DatasetItem:
     # Identification of the item
-    name: str
+    # name: str
 
     # The fitness associated with item.
     # Higher fitness increases the chance of
     # the item to be considered in the solution
-    fitness: int
+    # fitness: int
 
     # The weight associated with the solution.
     weight: float
+
+    # The volume associated with the solution
+    volume: float
 
 
 @dataclass
@@ -25,6 +28,11 @@ class DatasetOptions:
     # Value with the ideal weight
     expected_weight: float
 
+    # Value with the ideal volume
+    expected_volume: float
+    
+    # Amount of indiduals that will be mutated in each generation
+    # and also the amount that will be discarded
     selection_size: int = 10
 
     # How many generations to run
@@ -67,6 +75,16 @@ class Individual:
     # goal
     fitness: float = 0
 
+    # Current fitness of individual, based in the
+    # value assigned in it's genes and in the dataset
+    # goal
+    volume: float = 0
+
+    # Current fitness of individual, based in the
+    # value assigned in it's genes and in the dataset
+    # goal
+    weight: float = 0
+
     # Detemines whether the individual was selected
     # to the next generation
     selected: bool = False
@@ -83,17 +101,39 @@ class Individual:
         self.fitness = 0
 
         # Weight of the individual based in the dataset
-        weight = 0
+        self.weight = self.volume = 0
 
         for index, gene in enumerate(self.genes):
             if gene == 1:
                 item: DatasetItem = dataset.items[index]
-                weight += item.weight
-                self.fitness += item.fitness
+                self.weight += item.weight
+                self.volume += item.volume
+                # self.fitness += item.fitness
         
-        if weight > dataset.options.expected_weight:
+        # Use scale of 0..100 to find the fitness, where:
+        #   1. higher volume is good
+        #   2. lower weight is good
+
+        # calc a percentage of used volume
+        volume_usage = (self.volume * 100) / dataset.options.expected_volume
+
+        # calc a percentage of used weight
+        weight_usage = (self.weight * 100) / dataset.options.expected_weight
+
+        # Volume is already in the right direction (higher is better)
+        # but the weight is inversed, so we subtract it
+        self.fitness = volume_usage - weight_usage
+
+        # Just to normalize the fitness
+        self.fitness += 1000
+
+        if self.weight > dataset.options.expected_weight:
             # FIXME improve penality system
-            self.fitness -= 100
+            self.fitness -= 500
+
+        if self.volume > dataset.options.expected_volume:
+            # FIXME improve penality system
+            self.fitness -= 500
 
     def clone(self) -> "Individual":
         return Individual(

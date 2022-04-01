@@ -2,7 +2,8 @@ from argparse import ArgumentParser
 from pprint import pprint
 
 from .structures import SteamRoller
-from .dataset import load_from_file
+from .dataset import load_from_file, save_result
+    
 
 
 def main():
@@ -16,4 +17,7 @@ def main():
 
     dataset = load_from_file(args.dataset_file)
     sr = SteamRoller.from_dataset(dataset)
-    pprint(sr.smash()[:5])
+    results = sr.smash()
+    pprint(results[:5])
+
+    save_result(dataset, results[:5])
