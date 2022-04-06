@@ -22,6 +22,8 @@ class DatasetItem:
     # The volume associated with the solution
     volume: float
 
+    # The price associated with the solution
+    price: float
 
 @dataclass
 class DatasetOptions:
@@ -31,6 +33,9 @@ class DatasetOptions:
     # Value with the ideal volume
     expected_volume: float
     
+    # Value with the ideal price
+    expected_price: float
+
     # Amount of indiduals that will be mutated in each generation
     # and also the amount that will be discarded
     selection_size: int = 10
@@ -75,15 +80,20 @@ class Individual:
     # goal
     fitness: float = 0
 
-    # Current fitness of individual, based in the
+    # Current volume of individual, based in the
     # value assigned in it's genes and in the dataset
     # goal
     volume: float = 0
 
-    # Current fitness of individual, based in the
+    # Current weight of individual, based in the
     # value assigned in it's genes and in the dataset
     # goal
     weight: float = 0
+
+    # Current price of individual, based in the
+    # value assigned in it's genes and in the dataset
+    # goal
+    price: float = 0
 
     # Detemines whether the individual was selected
     # to the next generation
@@ -101,13 +111,14 @@ class Individual:
         self.fitness = 0
 
         # Weight of the individual based in the dataset
-        self.weight = self.volume = 0
+        self.weight = self.volume = self.price = 0
 
         for index, gene in enumerate(self.genes):
             if gene == 1:
                 item: DatasetItem = dataset.items[index]
                 self.weight += item.weight
                 self.volume += item.volume
+                self.price += item.price
                 # self.fitness += item.fitness
         
         # Use scale of 0..100 to find the fitness, where:
@@ -123,17 +134,20 @@ class Individual:
         # Volume is already in the right direction (higher is better)
         # but the weight is inversed, so we subtract it
         self.fitness = volume_usage - weight_usage
-
         # Just to normalize the fitness
+
         self.fitness += 1000
+
+        if self.price < dataset.options.expected_price:
+            self.fitness -= 200
 
         if self.weight > dataset.options.expected_weight:
             # FIXME improve penality system
-            self.fitness -= 500
+            self.fitness -= 400
 
         if self.volume > dataset.options.expected_volume:
             # FIXME improve penality system
-            self.fitness -= 500
+            self.fitness -= 400
 
     def clone(self) -> "Individual":
         return Individual(
@@ -288,7 +302,7 @@ class SteamRoller:
             self.apply_crossover()
             self.apply_mutation()
             self.evaluate_population()
-            self.apply_artificial_filter()            
+            self.apply_artificial_filter()
 
         return self.population
 
