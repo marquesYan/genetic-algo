@@ -1,5 +1,8 @@
 {
     "options": {
+        "base_fitness_weight": 0.4,
+        "base_fitness_volume": 0.4,
+        "base_fitness_price": 0.2,
         "expected_weight": 8000,
         "expected_volume": 20000000,
         "expected_price": 5000,

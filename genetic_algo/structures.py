@@ -36,6 +36,15 @@ class DatasetOptions:
     # Value with the ideal price
     expected_price: float
 
+    # Percentage used for generate the fitness
+    base_fitness_weight: float = 0.4
+
+    # Percentage used for generate the fitness
+    base_fitness_volume: float = 0.4
+    
+    # Percentage used for generate the fitness
+    base_fitness_price: float = 0.2
+
     # Amount of indiduals that will be mutated in each generation
     # and also the amount that will be discarded
     selection_size: int = 10
@@ -55,9 +64,16 @@ class DatasetOptions:
     # How many genes at most to mutate
     most_mutation_genes: int = 2
 
+    # Base for fitness value
+    base_fitness: float = 1000
+
     def __post_init__(self):
         # FIXME make sure most_crossover_genes is not
         # greater than genes size
+        self.base_fitness_price = self.base_fitness * self.base_fitness_price
+        self.base_fitness_weight = self.base_fitness * self.base_fitness_weight
+        self.base_fitness_volume = self.base_fitness * self.base_fitness_volume
+
         pass
 
 
@@ -134,20 +150,20 @@ class Individual:
         # Volume is already in the right direction (higher is better)
         # but the weight is inversed, so we subtract it
         self.fitness = volume_usage - weight_usage
-        # Just to normalize the fitness
 
-        self.fitness += 1000
+        # Just to normalize the fitness
+        self.fitness += dataset.options.base_fitness
 
         if self.price < dataset.options.expected_price:
-            self.fitness -= 200
+            self.fitness -= dataset.options.base_fitness_price
 
         if self.weight > dataset.options.expected_weight:
             # FIXME improve penality system
-            self.fitness -= 400
+            self.fitness -= dataset.options.base_fitness_weight
 
         if self.volume > dataset.options.expected_volume:
             # FIXME improve penality system
-            self.fitness -= 400
+            self.fitness -= dataset.options.base_fitness_volume
 
     def clone(self) -> "Individual":
         return Individual(
